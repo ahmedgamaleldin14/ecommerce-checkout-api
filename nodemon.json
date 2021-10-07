@@ -1,0 +1,6 @@
+{
+    "env": {
+      "DB_NAME": "ecommerce-checkpout"
+    }
+  }
+  
