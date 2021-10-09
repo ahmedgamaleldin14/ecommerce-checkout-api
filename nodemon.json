@@ -1,6 +1,10 @@
 {
     "env": {
-      "DB_NAME": "ecommerce-checkpout"
+      "DB_NAME": "ecommerce-checkout",
+      "DB_USER": "new_user",
+      "DB_PASSWORD": "ecommerce123456",
+      "STRIPE_PUBLIC_KEY": "pk_test_51Jil9jLw62x1INCfWdgxRYkVVs5e03EIVO7sh3ITwqp2mOhF3aj38WBVEJxHOK8YqLpZlSA1g2Y8hgPtQLDRfMGp00bj7zJ0zs",
+      "STRIPE_SECRET_KEY": "sk_test_51Jil9jLw62x1INCfL3LcP0AoBDdhvtHH6TuOaUpzYZ2XM2zUaTdbKMB9hgP9CWZ8it3AkfvXUMxJeO0sduTLLkFy00KozklZo1"
     }
   }
   
