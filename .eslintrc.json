@@ -11,5 +11,9 @@
         "sourceType": "module"
     },
     "rules": {
+        "consistent-return": "off",
+        "eslint-disable-next-line":"off",
+        "object-curly-newline": "off",
+        "arrow-body-style": "off"
     }
 }
