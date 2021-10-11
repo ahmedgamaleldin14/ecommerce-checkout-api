@@ -106,9 +106,14 @@ const updateItem = async (req, res, next) => {
   const itemId = req.params.id;
   try {
     const item = await Item.findById(itemId).exec();
-    item.name = name;
-    item.price = price;
-    item.quantity = quantity;
+    if (name) item.name = name;
+    if (price) item.price = price;
+    if (quantity) {
+      item.quantity = quantity;
+      if (!item.isAvailable && item.quantity > 0) {
+        item.isAvailable = true;
+      }
+    }
 
     await item.save();
 
