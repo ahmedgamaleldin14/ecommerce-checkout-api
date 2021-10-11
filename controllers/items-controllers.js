@@ -68,9 +68,24 @@ const getItemById = async (req, res, next) => {
 
     res.json({ data: item });
   } catch (err) {
+    console.log(err);
     return next(
       new HttpError(
         'Getting the item has failed, please try again!',
+        500,
+      ),
+    );
+  }
+};
+
+const getAllItems = async (req, res, next) => {
+  try {
+    const items = await Item.find({}).lean();
+    res.json({ data: items });
+  } catch (err) {
+    return next(
+      new HttpError(
+        'Getting the items has failed, please try again!',
         500,
       ),
     );
@@ -91,7 +106,7 @@ const updateItem = async (req, res, next) => {
   const { name, price, quantity } = req.body;
   const itemId = req.params.id;
   try {
-    const item = await Item.findById(itemId).lean();
+    const item = await Item.findById(itemId).exec();
     item.name = name;
     item.price = price;
     item.quantity = quantity;
@@ -153,3 +168,4 @@ exports.addItem = addItem;
 exports.getItemById = getItemById;
 exports.updateItem = updateItem;
 exports.buyItem = buyItem;
+exports.getAllItems = getAllItems;

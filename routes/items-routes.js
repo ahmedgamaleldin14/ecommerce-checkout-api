@@ -5,10 +5,12 @@ const itemsControllers = require('../controllers/items-controllers');
 
 const router = express.Router();
 
+router.get('/', itemsControllers.getAllItems);
+
 router.get('/:id', itemsControllers.getItemById);
 
 router.post(
-  '/',
+  '/create',
   [
     check('name').not().isEmpty(),
     check('serialNumber').not().isEmpty(),
@@ -28,10 +30,10 @@ router.patch(
   itemsControllers.updateItem,
 );
 
-router.patch(
-  '/buy/:id',
-  [check('quantity').isFloat({ min: 1 })],
-  itemsControllers.buyItem,
-);
+// router.patch(
+//   '/buy/:id',
+//   [check('quantity').isFloat({ min: 1 })],
+//   itemsControllers.buyItem,
+// );
 
 module.exports = router;
