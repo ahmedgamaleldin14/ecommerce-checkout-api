@@ -68,7 +68,6 @@ const getItemById = async (req, res, next) => {
 
     res.json({ data: item });
   } catch (err) {
-    console.log(err);
     return next(
       new HttpError(
         'Getting the item has failed, please try again!',
