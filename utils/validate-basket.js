@@ -1,18 +1,16 @@
-const mongoose = require('mongoose');
-
 const HttpError = require('../models/HttpError');
 const Item = require('../models/Item');
 
-const getItems = async (ids) => {
+const getItems = async (itemsArr) => {
   try {
-    const objectIds = ids.map((id) => {
-      return mongoose.Types.ObjectId(id);
-    });
-
-    const items = await Item.find({
-      _id: { $in: objectIds },
-    }).lean();
-    return items;
+    const newItemsArr = await Promise.all(
+      itemsArr.map(async (item) => {
+        const existingItem = await Item.findById(item.id).lean();
+        existingItem.orderedQuantity = item.quantity;
+        return existingItem;
+      }),
+    );
+    return newItemsArr;
   } catch (err) {
     throw new HttpError('Some of the items does not exist.', 400);
   }
@@ -20,10 +18,21 @@ const getItems = async (ids) => {
 
 const validateAvailability = async (items) => {
   items.forEach((item) => {
-    const { name, isAvailable, quantity } = item;
-    if (!isAvailable || quantity < 1) {
+    const {
+      name,
+      isAvailable,
+      quantity: originalQuantity,
+      orderedQuantity,
+    } = item;
+
+    if (!isAvailable) {
       throw new HttpError(
-        `This item {${name}} is not available`,
+        `This item {${name}} is not available.`,
+        400,
+      );
+    } else if (originalQuantity - orderedQuantity < 0) {
+      throw new HttpError(
+        `Not enough quantity {${orderedQuantity}} for this item {${name}}`,
         400,
       );
     }
@@ -33,7 +42,8 @@ const validateAvailability = async (items) => {
 const validateMinPrice = async (items) => {
   let totalPrice = 0;
   items.forEach((item) => {
-    totalPrice += item.price;
+    const { price, orderedQuantity } = item;
+    totalPrice += price * orderedQuantity;
   });
   if (totalPrice < 100) {
     throw new HttpError(
@@ -46,8 +56,8 @@ const validateMinPrice = async (items) => {
 const checkFraud = async (items) => {
   let totalPrice = 0;
   items.forEach((item) => {
-    const { price, quantity } = item;
-    totalPrice += price * quantity;
+    const { price, orderedQuantity } = item;
+    totalPrice += price * orderedQuantity;
   });
   if (totalPrice > 1500) {
     throw new HttpError('Warning ----> Fraud user', 400);
