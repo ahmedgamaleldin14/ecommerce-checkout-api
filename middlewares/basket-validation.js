@@ -7,13 +7,18 @@ const {
 
 module.exports = () => {
   return async (req, res, next) => {
-    const { itemIds } = req.body;
+    const { itemsArr } = req.body;
 
     try {
-      const items = await getItems(itemIds);
+      const items = await getItems(itemsArr);
       await validateAvailability(items);
       await validateMinPrice(items);
       await checkFraud(items);
+
+      items.forEach((item) => {
+        item.quantity = item.orderedQuantity;
+        delete item.orderedQuantity;
+      });
 
       req.body = items;
     } catch (err) {
