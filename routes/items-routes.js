@@ -23,9 +23,9 @@ router.post(
 router.patch(
   '/:id',
   [
-    check('name').not().isEmpty(),
-    check('quantity').isFloat({ min: 0 }),
-    check('price').isFloat({ min: 0 }),
+    check('name').optional().not().isEmpty(),
+    check('quantity').optional().isFloat({ min: 0 }),
+    check('price').optional().isFloat({ min: 0 }),
   ],
   itemsControllers.updateItem,
 );
