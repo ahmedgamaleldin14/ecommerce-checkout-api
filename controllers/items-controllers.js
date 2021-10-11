@@ -4,6 +4,7 @@ const aqp = require('api-query-params');
 const HttpError = require('../models/HttpError');
 const Item = require('../models/Item');
 
+// add an item to the collection
 const addItem = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -18,6 +19,7 @@ const addItem = async (req, res, next) => {
   try {
     const { name, serialNumber, price, quantity } = req.body;
 
+    // check for duplicates using serial number
     const duplicateItem = await Item.findOne({ serialNumber }).lean();
     if (duplicateItem) {
       return next(new HttpError('This item already exists', 422));
@@ -43,6 +45,7 @@ const addItem = async (req, res, next) => {
   }
 };
 
+// get an item using item id
 const getItemById = async (req, res, next) => {
   try {
     const itemId = req.params.id;
@@ -55,7 +58,9 @@ const getItemById = async (req, res, next) => {
       );
     }
 
+    // check if a specific quantity of this item required
     if (number) {
+      // check if the oredered quantity did not exceed the limit
       if (item.quantity < number) {
         return next(
           new HttpError(
@@ -77,6 +82,7 @@ const getItemById = async (req, res, next) => {
   }
 };
 
+// get all items
 const getAllItems = async (req, res, next) => {
   try {
     const items = await Item.find({}).lean();
@@ -91,6 +97,7 @@ const getAllItems = async (req, res, next) => {
   }
 };
 
+// update an item fields (name, price, quantity)
 const updateItem = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -109,6 +116,7 @@ const updateItem = async (req, res, next) => {
     if (name) item.name = name;
     if (price) item.price = price;
     if (quantity) {
+      // reset isAvailable flag if possible
       item.quantity = quantity;
       if (!item.isAvailable && item.quantity > 0) {
         item.isAvailable = true;

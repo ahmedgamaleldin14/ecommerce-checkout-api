@@ -1,6 +1,7 @@
 const HttpError = require('../models/HttpError');
 const Item = require('../models/Item');
 
+// get the items specified by ids in the itemsArr and add orderedQuality record
 const getItems = async (itemsArr) => {
   try {
     const newItemsArr = await Promise.all(
@@ -16,6 +17,7 @@ const getItems = async (itemsArr) => {
   }
 };
 
+// Check whether the item is available or the ordered quantity exceeded the limit
 const validateAvailability = async (items) => {
   items.forEach((item) => {
     const {
@@ -39,6 +41,7 @@ const validateAvailability = async (items) => {
   });
 };
 
+// check if the minimum allowed price is applied
 const validateMinPrice = async (items) => {
   let totalPrice = 0;
   items.forEach((item) => {
@@ -53,6 +56,7 @@ const validateMinPrice = async (items) => {
   }
 };
 
+// check for fraud user by making sure total price does not exceed 1500
 const checkFraud = async (items) => {
   let totalPrice = 0;
   items.forEach((item) => {

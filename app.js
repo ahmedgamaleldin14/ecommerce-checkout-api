@@ -9,7 +9,8 @@ const basketsRoutes = require('./routes/baskets-routes');
 const HttpError = require('./models/HttpError');
 
 const app = express();
-// corse header
+
+// cors header
 app.use(
   cors({
     origin: true,
@@ -23,7 +24,6 @@ app.use(bodyParser.json());
 app.use('/api/users', usersRoutes);
 app.use('/api/items', itemsRoutes);
 app.use('/api/baskets', basketsRoutes);
-
 app.use((req, res, next) => {
   const error = new HttpError('Could not find this route.', 404);
   throw error;
@@ -39,6 +39,7 @@ app.use((error, req, res, next) => {
   });
 });
 
+// connecting to MongoDB Database Cluster
 mongoose
   .connect(
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.uprmu.mongodb.net/ecommerce-checkout?retryWrites=true&w=majority`,

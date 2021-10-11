@@ -7,6 +7,7 @@ const Basket = require('../models/Basket');
 const User = require('../models/User');
 const Item = require('../models/Item');
 
+// create basket for a specific user to be ready for order
 const createBasket = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -22,6 +23,7 @@ const createBasket = async (req, res, next) => {
   const { userId } = req.params;
 
   try {
+    // check if this user exists
     const existingUser = await User.findById(userId).lean();
     if (!existingUser) {
       return next(new HttpError('The user does not exist!', 422));
@@ -46,6 +48,7 @@ const createBasket = async (req, res, next) => {
   }
 };
 
+// place an order using the existing basket
 const placeOrder = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -68,6 +71,7 @@ const placeOrder = async (req, res, next) => {
 
     const { items } = existingBasket;
     let totalPrice = 0;
+    // for each item, deduct the quantity bought and calculate total price
     items.forEach(async (item) => {
       try {
         const { _id: itemId, quantity, price } = item;
@@ -88,9 +92,11 @@ const placeOrder = async (req, res, next) => {
       }
     });
 
+    // create a new customer
     const customer = await stripe.customers.create({
       email,
     });
+    // prepare payment method
     const paymentMethod = await stripe.paymentMethods.create({
       type: 'card',
       card: {
@@ -100,9 +106,11 @@ const placeOrder = async (req, res, next) => {
         cvc,
       },
     });
+    // attach the payment to the created customer
     await stripe.paymentMethods.attach(paymentMethod.id, {
       customer: customer.id,
     });
+    // charge the customer and finish payment
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalPrice,
       customer: customer.id,
